@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import fishData from '../../helpers/data/fishData';
+import Fish from '../Fish/Fish';
 import './Inventory.scss';
 
 export default class Inventory extends Component {
@@ -15,9 +16,16 @@ export default class Inventory extends Component {
   }
 
   render() {
+    const fishComponents = this.state.fishes.map(fish => (
+      <Fish key={fish.id} fish={fish}/>
+    ));
+
     return (
       <div>
-        <h3>Inventory</h3>
+        <h2>Inventory</h2>
+        <ul className="fishes">
+        { fishComponents }
+        </ul>
       </div>
     );
   }
