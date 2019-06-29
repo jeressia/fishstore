@@ -1,26 +1,21 @@
 import React, { Component } from 'react';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import PropTypes from 'prop-types';
 
+import fishShapes from '../../helpers/propz/fishShapes';
 import OrderRow from '../OrderRow/OrderRow';
-import orderData from '../../helpers/data/orderData';
+
 
 import './Orders.scss';
 
 export default class Orders extends Component {
-  state = {
-    orders: [],
-  }
-
-  componentDidMount() {
-    orderData.getMyOrders(firebase.auth().currentUser.uid)
-      .then(orders => this.setState({ orders }))
-      .catch(err => console.error('uh-oh, orders', err));
+  static propTypes = {
+    order: PropTypes.arrayOf(fishShapes),
+    deleteOrder: PropTypes.func.isRequired,
   }
 
   render() {
-    const orderComponents = this.state.orders.map(order => (
-      <OrderRow key={order.id} order={order} />
+    const orderComponents = this.props.orders.map(order => (
+      <OrderRow key={order.id} order={order} deleteOrder={this.props.deleteOrder}/>
     ));
     return (
       <div className="Orders">
