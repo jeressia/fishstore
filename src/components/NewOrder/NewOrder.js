@@ -7,6 +7,11 @@ class NewOrder extends React.Component {
     orderName: '',
   }
 
+  nameChange = (e) => {
+    e.preventDefault();
+    this.setState({ orderName: e.target.value });
+  }
+
   renderOrder = (key) => {
     const fish = this.props.fishes.find(x => x.id === key);
     const count = this.props.fishOrder[key];
@@ -33,8 +38,15 @@ class NewOrder extends React.Component {
     );
   };
 
+  saveOrder = (e) => {
+    e.preventDefault();
+    this.props.saveNewOrder(this.state.orderName);
+    this.setState({ orderName: '' });
+  }
+
   render() {
     const { fishOrder } = this.props;
+    const { orderName } = this.state;
     const orderIds = Object.keys(fishOrder);
     const orderExists = orderIds.length > 0;
     const total = orderIds.reduce((prevTotal, key) => {
@@ -52,7 +64,7 @@ class NewOrder extends React.Component {
               type="text"
               className="form-control"
               id="order-name"
-              placeholder="John's Order"
+              placeholder="John's Order" value={ orderName } onChange={this.nameChange}
             />
           </div>
         </form>
@@ -63,7 +75,7 @@ class NewOrder extends React.Component {
         <div className="text-center">
           {
             orderExists ? (
-              <button className="btn btn-outline-dark"> Save Order </button>
+              <button className="btn btn-outline-dark" onClick={this.saveOrder}> Save Order </button>
             ) : (
               <div>Add Inventory to your order</div>
             )

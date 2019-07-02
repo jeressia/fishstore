@@ -50,6 +50,18 @@ class Home extends React.Component {
       .catch(err => console.error('not deleted', err));
   }
 
+  saveNewOrder = (orderName) => {
+    const newOrder = { fishes: { ...this.state.fishOrder }, name: orderName };
+    newOrder.dateTime = Date.now();
+    newOrder.uid = firebase.auth().currentUser.uid;
+    orderData.postOrder(newOrder)
+      .then(() => {
+        this.setState({ fishOrder: {} });
+        this.getOrders();
+      })
+      .catch(err => console.error('error in post order', err));
+  };
+
   render() {
     const { fishes, orders, fishOrder } = this.state;
     return (
@@ -62,7 +74,8 @@ class Home extends React.Component {
               <NewOrder
               fishes={fishes}
               fishOrder={ fishOrder }
-              removeFromOrder ={this.removeFromOrder} />
+              removeFromOrder ={this.removeFromOrder}
+              saveNewOrder = {this.saveNewOrder} />
             </div>
             <div className="col">
                   <Orders orders={orders} deleteOrder={this.deleteOrder}/>
