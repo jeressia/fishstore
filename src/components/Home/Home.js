@@ -15,6 +15,7 @@ class Home extends React.Component {
   state = {
     orders: [],
     fishes: [],
+    fishOrder: {},
   }
 
   getOrders = () => {
@@ -31,30 +32,58 @@ class Home extends React.Component {
     this.getOrders();
   }
 
-deleteOrder = (orderId) => {
-  orderData.deleteOrder(orderId)
-    .then(() => this.getOrders())
-    .catch(err => console.error('not deleted', err));
-}
+  addFishToOrder = (fishId) => {
+    const fishOrderCopy = { ...this.state.fishOrder };
+    fishOrderCopy[fishId] = fishOrderCopy[fishId] + 1 || 1;
+    this.setState({ fishOrder: fishOrderCopy });
+  }
 
-render() {
-  const { fishes, orders } = this.state;
-  return (
-      <div className="Home">
-        <div className="row">
-          <div className="col">
-            <Inventory fishes={fishes}/>
-          </div>
-          <div className="col">
-            <NewOrder />
-          </div>
-          <div className="col">
-                <Orders orders={orders} deleteOrder={this.deleteOrder}/>
+  removeFromOrder = (key) => {
+    const fishOrderCopy = { ...this.state.fishOrder };
+    delete fishOrderCopy[key];
+    this.setState({ fishOrder: fishOrderCopy });
+  };
+
+  deleteOrder = (orderId) => {
+    orderData.deleteOrder(orderId)
+      .then(() => this.getOrders())
+      .catch(err => console.error('not deleted', err));
+  }
+
+  saveNewOrder = (orderName) => {
+    const newOrder = { fishes: { ...this.state.fishOrder }, name: orderName };
+    newOrder.dateTime = Date.now();
+    newOrder.uid = firebase.auth().currentUser.uid;
+    orderData.postOrder(newOrder)
+      .then(() => {
+        this.setState({ fishOrder: {} });
+        this.getOrders();
+      })
+      .catch(err => console.error('error in post order', err));
+  };
+
+  render() {
+    const { fishes, orders, fishOrder } = this.state;
+    return (
+        <div className="Home">
+          <div className="row">
+            <div className="col">
+              <Inventory fishes={fishes} addFishToOrder={this.addFishToOrder}/>
+            </div>
+            <div className="col">
+              <NewOrder
+              fishes={fishes}
+              fishOrder={ fishOrder }
+              removeFromOrder ={this.removeFromOrder}
+              saveNewOrder = {this.saveNewOrder} />
+            </div>
+            <div className="col">
+                  <Orders orders={orders} deleteOrder={this.deleteOrder}/>
+                </div>
               </div>
             </div>
-          </div>
-  );
-}
+    );
+  }
 }
 
 export default Home;
